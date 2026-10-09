@@ -3,14 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EMIS Student List to Excel</title>
+<title>SIS PDF to Excel</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0a0e1a">
 <style>
 :root{--bg:#0a0e1a;--card:rgba(255,255,255,.045);--ink:#eaf0ff;--mut:#8b97b8;--line:rgba(255,255,255,.09);--a:#7c5cff;--b:#00d4ff;--g:#2ee59d;--y:#ffb020;--r:#ff4d6a}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.5 "Inter",system-ui,Segoe UI,Arial,sans-serif;padding:18px;min-height:100vh;
 background:radial-gradient(900px 500px at 10% -10%,rgba(124,92,255,.28),transparent),radial-gradient(800px 500px at 100% 0,rgba(0,212,255,.18),transparent),var(--bg)}
 main{max-width:1120px;margin:0 auto}
 .top{display:flex;align-items:center;gap:14px;margin:6px 0 18px}
-.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-weight:800;font-size:15px;box-shadow:0 8px 30px rgba(124,92,255,.45)}
+.logo{width:56px;height:56px;flex:none;filter:drop-shadow(0 8px 24px rgba(124,92,255,.55))}.logo svg{width:100%;height:100%;display:block}.arr{background:linear-gradient(135deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
 h1{font-size:24px;margin:0;letter-spacing:-.02em}.sub{color:var(--mut);margin:2px 0 0;font-size:13px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .pipe{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
@@ -44,8 +51,8 @@ tbody tr:hover td{background:rgba(124,92,255,.1)}tr.flag td{background:rgba(255,
 </head>
 <body>
 <main>
-<div class="top"><div class="logo">XL</div><div><h1>EMIS Student List → Excel</h1>
-<p class="sub">SIS Punjab PDF in, clean spreadsheet out. 100% in your browser: nothing is uploaded.</p></div></div>
+<div class="top"><div class="logo"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#00d4ff"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#g)"/><path d="M18 11h19l11 11v28a3 3 0 0 1-3 3H18a3 3 0 0 1-3-3V14a3 3 0 0 1 3-3z" fill="#fff"/><path d="M37 11v8a3 3 0 0 0 3 3h8z" fill="#c9d4ff"/><g stroke="#7c5cff" stroke-width="2.4" stroke-linecap="round"><path d="M21 29h22M21 36h22M21 43h22M29 27v18"/></g><circle cx="47" cy="47" r="10" fill="#10172b"/><path d="M42.5 47h8m-3.5-3.5 3.5 3.5-3.5 3.5" fill="none" stroke="#2ee59d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h1>SIS PDF <span class="arr">→</span> Excel</h1>
+<p class="sub">Punjab student lists, converted cleanly. 100% in your browser: nothing is uploaded.</p></div></div>
 <div class="pipe">
 <div><i class="led" id="L_eng"></i>Engine</div><div><i class="led" id="L_pdf"></i>PDF</div>
 <div><i class="led" id="L_parse"></i>Parse</div><div><i class="led" id="L_chk"></i>Checks</div><div><i class="led" id="L_xl"></i>Export</div></div>
