@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMIS Student List to Excel</title>
+<style>
+:root{--bg:#0a0e1a;--card:rgba(255,255,255,.045);--ink:#eaf0ff;--mut:#8b97b8;--line:rgba(255,255,255,.09);--a:#7c5cff;--b:#00d4ff;--g:#2ee59d;--y:#ffb020;--r:#ff4d6a}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.5 "Inter",system-ui,Segoe UI,Arial,sans-serif;padding:18px;min-height:100vh;
+background:radial-gradient(900px 500px at 10% -10%,rgba(124,92,255,.28),transparent),radial-gradient(800px 500px at 100% 0,rgba(0,212,255,.18),transparent),var(--bg)}
+main{max-width:1120px;margin:0 auto}
+.top{display:flex;align-items:center;gap:14px;margin:6px 0 18px}
+.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-weight:800;font-size:15px;box-shadow:0 8px 30px rgba(124,92,255,.45)}
+h1{font-size:24px;margin:0;letter-spacing:-.02em}.sub{color:var(--mut);margin:2px 0 0;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.pipe{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pipe div{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:12.5px;color:var(--mut)}
+.led{width:10px;height:10px;border-radius:50%;background:#3a4460;flex:none;transition:.3s}
+.led.g{background:var(--g);box-shadow:0 0 0 3px rgba(46,229,157,.15),0 0 12px var(--g)}
+.led.y{background:var(--y);box-shadow:0 0 0 3px rgba(255,176,32,.15),0 0 12px var(--y)}
+.led.r{background:var(--r);box-shadow:0 0 0 3px rgba(255,77,106,.15),0 0 12px var(--r)}
+.led.blink{animation:bl 1s infinite}@keyframes bl{50%{opacity:.25}}
+#drop{border:2px dashed rgba(255,255,255,.18);text-align:center;padding:48px 16px;cursor:pointer;border-radius:16px;transition:.2s}
+#drop:hover,#drop.over{border-color:var(--b);background:rgba(0,212,255,.06);transform:translateY(-1px)}
+#drop .ico{font-size:38px;display:block;margin-bottom:6px}#drop b{display:block;font-size:18px}#drop span{color:var(--mut)}
+button{font:inherit;border:0;border-radius:12px;padding:11px 20px;cursor:pointer;color:#fff;font-weight:700;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 8px 24px rgba(124,92,255,.35);transition:.15s}
+button:hover{transform:translateY(-1px);filter:brightness(1.1)}button.ghost{background:transparent;box-shadow:none;border:1px solid var(--line);color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.03)}
+.stat b{font-size:28px;display:block;line-height:1.1;background:linear-gradient(135deg,#fff,var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}.stat span{color:var(--mut);font-size:12.5px}
+#school{font-weight:700;font-size:17px;margin-bottom:12px}
+.chk{display:flex;align-items:center;gap:10px;padding:9px 12px;margin-top:8px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid var(--line);font-size:14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input,select{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.05);color:var(--ink);outline:none}
+input:focus,select:focus{border-color:var(--b)}select option{background:#141a2c}
+.wrap{overflow:auto;max-height:60vh;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:left}
+th{position:sticky;top:0;background:#151c33;color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+tbody tr:hover td{background:rgba(124,92,255,.1)}tr.flag td{background:rgba(255,176,32,.1)}
+.pill{padding:2px 9px;border-radius:999px;background:rgba(124,92,255,.22);color:#cbbfff;font-size:12px}
+.gd{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.gM{background:var(--b)}.gF{background:#ff6bd6}
+.note{font-size:12.5px;color:var(--mut)}.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><div class="logo">XL</div><div><h1>EMIS Student List → Excel</h1>
+<p class="sub">SIS Punjab PDF in, clean spreadsheet out. 100% in your browser: nothing is uploaded.</p></div></div>
+<div class="pipe">
+<div><i class="led" id="L_eng"></i>Engine</div><div><i class="led" id="L_pdf"></i>PDF</div>
+<div><i class="led" id="L_parse"></i>Parse</div><div><i class="led" id="L_chk"></i>Checks</div><div><i class="led" id="L_xl"></i>Export</div></div>
+
+<div class="card" id="upload">
+  <div id="drop"><span class="ico">📄</span><b>Drop the student-list PDF here</b><span>or tap to choose a file</span><input id="file" type="file" accept="application/pdf" hidden></div>
+  <div id="status" class="note" style="margin-top:10px"></div>
+</div>
+
+<div id="result" class="hide">
+  <div class="card">
+    <div id="school" style="font-weight:600;margin-bottom:10px"></div>
+    <div class="stats" id="stats"></div>
+    <div id="checks"></div>
+    <div class="bar" style="margin-top:14px">
+      <button id="dl">Download Excel (.xlsx)</button>
+      <button class="ghost" id="reset">Convert another PDF</button>
+    </div>
+    <div class="note">Data is for official use only. Handle the exported file accordingly.</div>
+  </div>
+  <div class="card">
+    <div class="bar"><input id="q" placeholder="Search name, father, Form-B…" style="flex:1;min-width:180px"><select id="cls"></select></div>
+    <div class="wrap"><table><thead><tr><th>#</th><th>Enrl #</th><th>Name</th><th>G</th><th>DOB</th><th>Age</th><th>Admission</th><th>Father / Guardian</th><th>Form-B</th><th>Class</th><th>Remarks</th></tr></thead><tbody id="tb"></tbody></table></div>
+  </div>
+</div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>
+//--CORE--
+const MON={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+const DATE='\\d{1,2}-[A-Za-z]{3}-\\d{2}';
+const HEAD=new RegExp(`^(\\d+) (?:(\\d+) )?(.+?) ([MF]) (${DATE}) ([\\d.]+) (${DATE}) \\(\\w\\) (.+)$`);
+const SKIP=/^(Downloaded by|this data may|#\s|!|All this data|Unauthorized)/i;
+const TITLE=/All students of EMIS:\s*(\d+)\s*-\s*(.+)/i;
+const KNOWN=['PLAY GROUP','PLAYGROUP','PRE-PRIMARY','KATCHI','NURSERY','PREP','ECE','KG'];
+const flat=a=>a.map(i=>i.s).join(' ').replace(/\s+/g,' ').trim();
+
+function toDate(s,pivotNow){
+  const [d,m,y]=s.split('-');let yr=2000+ +y;
+  const dt=new Date(Date.UTC(yr,MON[m.toUpperCase()],+d));
+  if(dt.getTime()>Date.now()+(pivotNow?0:366*864e5))dt.setUTCFullYear(yr-100);
+  return dt;
+}
+function splitTail(rest){
+  let cls='';
+  for(const k of KNOWN){if(rest.toUpperCase().endsWith(' '+k)){cls=k;rest=rest.slice(0,-k.length-1).trim();break}}
+  if(!cls){const m=rest.match(/^(.*) (\S+)$/);if(m){rest=m[1];cls=m[2]}}
+  const m=rest.match(/^(.*?)(?: (\d{13}|0))?$/);
+  return{father:m[1].trim(),formb:m[2]&&m[2]!=='0'?m[2]:null,cls};
+}
+async function parsePdf(lib,data){
+  const pdf=await lib.getDocument({data}).promise;
+  let nameLo=null,nameHi=null,title=null,items=[];
+  for(let p=1;p<=pdf.numPages;p++){
+    const tc=await(await pdf.getPage(p)).getTextContent();
+    const its=tc.items.filter(i=>i.str.trim()).map(i=>({s:i.str.trim(),x:i.transform[4],y:i.transform[5]}));
+    its.sort((a,b)=>b.y-a.y||a.x-b.x);
+    const lines=[];
+    for(const it of its){const l=lines[lines.length-1];if(l&&Math.abs(l.y-it.y)<2.5)l.it.push(it);else lines.push({y:it.y,it:[it]})}
+    for(const l of lines){
+      l.it.sort((a,b)=>a.x-b.x);const f=flat(l.it);
+      const t=f.match(TITLE);if(t){title={code:t[1],name:t[2].trim()};continue}
+      const hn=l.it.find(i=>i.s==='NAME'),hf=l.it.find(i=>/^F\s*\/\s*M$/.test(i.s)),he=l.it.find(i=>/^ENRL/.test(i.s));
+      if(hn&&hf){nameLo=he?(he.x+hn.x)/2:hn.x-20;nameHi=hf.x-10;continue}
+      if(SKIP.test(f))continue;
+      if(f.startsWith('- ')){const last=[...items].reverse().find(i=>i.k==='row');if(last)last.remark=f.slice(2);continue}
+      if(nameLo!==null&&/^\d+ /.test(f)&&new RegExp(DATE).test(f)){
+        const left=flat(l.it.filter(i=>i.x<nameLo)),name=flat(l.it.filter(i=>i.x>=nameLo&&i.x<nameHi)),right=flat(l.it.filter(i=>i.x>=nameHi));
+        items.push({k:'row',left,name,right,flat:f,remark:null});continue}
+      if(nameLo!==null&&!new RegExp(DATE).test(f)&&l.it.every(i=>i.x>=nameLo&&i.x<nameHi)){items.push({k:'frag',s:f});continue}
+      items.push({k:'other',s:f});
+    }
+  }
+  items.forEach((it,i)=>{ // attach wrapped-name fragments to adjacent rows
+    if(it.k!=='frag')return;const n=items[i+1],pv=items[i-1];
+    if(n&&n.k==='row'&&!n.name)n.name=it.s;
+    else if(pv&&pv.k==='row')pv.name=(pv.name+' '+it.s).trim();
+    else it.k='other';
+  });
+  const rows=[],unparsed=[];
+  for(const it of items){
+    if(it.k==='other'){unparsed.push(it.s);continue}
+    if(it.k!=='row')continue;
+    const m=HEAD.exec(`${it.left} ${it.name} ${it.right}`.replace(/\s+/g,' ').trim())||HEAD.exec(it.flat);
+    if(!m){unparsed.push(it.flat);continue}
+    const[,serial,enrl,name,g,dob,age,adm,rest]=m,t=splitTail(rest);
+    rows.push({serial:+serial,enrl:enrl?+enrl:null,name,g,dob:toDate(dob,true),age:+age,adm:toDate(adm,false),
+      father:t.father,formb:t.formb,cls:/^\d+$/.test(t.cls)?'Class '+t.cls:t.cls,remark:it.remark?(it.remark[0]+it.remark.slice(1).toLowerCase()).replace(/b form/i,'B-Form'):null});
+  }
+  return{title,rows,unparsed};
+}
+//--UI--
+const $=id=>document.getElementById(id);let state=null;
+const fmt=d=>d?`${String(d.getUTCDate()).padStart(2,'0')}-${Object.keys(MON)[d.getUTCMonth()]}-${d.getUTCFullYear()}`:'';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function handle(file){
+  if(!file||!/pdf$/i.test(file.type||file.name)){$('status').textContent='Please choose a PDF file.';return}
+  ['pdf','parse','chk','xl'].forEach(i=>led(i));led('pdf','y',1);$('status').textContent='Reading PDF…';
+  try{
+    led('pdf','g');led('parse','y',1);
+    const r=await parsePdf(pdfjsLib,new Uint8Array(await file.arrayBuffer()));
+    if(!r.rows.length)throw new Error('No student rows found. Is this an EMIS “All students” PDF?');
+    led('parse','g');state=r;show(r);$('status').textContent='';
+  }catch(e){led('pdf','r');led('parse','r');$('status').textContent='Could not read this PDF: '+e.message}
+}
+function show(r){
+  const rows=r.rows,boys=rows.filter(x=>x.g==='M').length,sers=rows.map(x=>x.serial),mx=Math.max(...sers);
+  const miss=[];for(let i=1;i<=mx;i++)if(!sers.includes(i))miss.push(i);
+  const nb=rows.filter(x=>!x.formb),ne=rows.filter(x=>x.enrl===null),fl=rows.filter(x=>x.remark);
+  $('school').textContent=r.title?`EMIS ${r.title.code} – ${r.title.name}`:'Student list';
+  const st=[[rows.length,'Students'],[boys,'Boys'],[rows.length-boys,'Girls'],[new Set(rows.map(x=>x.cls)).size,'Classes'],[nb.length,'No Form-B']];
+  $('stats').innerHTML=st.map(([n,l])=>`<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
+  const ck=[];
+  ck.push(miss.length?['y',`Missing serial numbers: ${miss.join(', ')}`]:['g',`All ${rows.length} rows read, serials 1–${mx} complete`]);
+  ck.push(r.unparsed.length?['r',`${r.unparsed.length} line(s) could not be placed: ${esc(r.unparsed.slice(0,3).join(' | '))}`]:['g','No unreadable lines']);
+  ck.push(fl.length?['y',`Duplicate Form-B notice on row(s): ${fl.map(x=>x.serial).join(', ')}`]:['g','No duplicate Form-B notices']);
+  ck.push(ne.length?['y',`Blank Enrl # on row(s): ${ne.map(x=>x.serial).join(', ')}`]:['g','All Enrl # present']);
+  $('checks').innerHTML=ck.map(([c,t])=>`<div class="chk"><i class="led ${c}"></i>${t}</div>`).join('');
+  led('chk',ck.some(c=>c[0]==='r')?'r':ck.some(c=>c[0]==='y')?'y':'g');
+  const cl=[...new Set(rows.map(x=>x.cls))];
+  $('cls').innerHTML='<option value="">All classes</option>'+cl.map(c=>`<option>${esc(c)}</option>`).join('');
+  render();$('upload').classList.add('hide');$('result').classList.remove('hide');
+}
+function render(){
+  const q=$('q').value.trim().toLowerCase(),c=$('cls').value;
+  $('tb').innerHTML=state.rows.filter(x=>(!c||x.cls===c)&&(!q||[x.name,x.father,x.formb,x.enrl].join(' ').toLowerCase().includes(q)))
+   .map(x=>`<tr class="${x.remark?'flag':''}"><td>${x.serial}</td><td>${x.enrl??''}</td><td>${esc(x.name)}</td><td><i class="gd g${x.g}"></i>${x.g}</td><td>${fmt(x.dob)}</td><td>${x.age}</td><td>${fmt(x.adm)}</td><td>${esc(x.father)}</td><td>${x.formb??''}</td><td><span class="pill">${esc(x.cls)}</span></td><td>${esc(x.remark)}</td></tr>`).join('');
+}
+async function download(){
+  led('xl','y',1);
+  const {title,rows}=state,wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Students',{views:[{state:'frozen',xSplit:3,ySplit:3}]});
+  const F={name:'Arial',size:10},thin={style:'thin',color:{argb:'FFBFBFBF'}},bd={top:thin,bottom:thin,left:thin,right:thin};
+  ws.mergeCells('A1:K1');ws.getCell('A1').value=title?`All students of EMIS: ${title.code} - ${title.name}`:'Student List';
+  ws.getCell('A1').font={name:'Arial',bold:true,size:13};
+  const hdr=['#','Enrl #','Name','Gender','DOB','Age','Admission Date','Father / Guardian','Form-B','Class','Remarks'];
+  ws.getRow(3).values=hdr;
+  ws.getRow(3).eachCell(c=>{c.font={name:'Arial',bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}};c.border=bd;c.alignment={horizontal:'center'}});
+  rows.forEach((x,i)=>{
+    const r=ws.getRow(4+i);r.values=[x.serial,x.enrl,x.name,x.g,x.dob,x.age,x.adm,x.father,x.formb,x.cls,x.remark];
+    r.eachCell({includeEmpty:true},(c,n)=>{if(n>11)return;c.font=F;c.border=bd;
+      if(n===5||n===7)c.numFmt='DD-MMM-YYYY';if(n===6)c.numFmt='0.0';if(n===9)c.numFmt='@';
+      if([1,2,4,5,6,7,9,10].includes(n))c.alignment={horizontal:'center'};
+      if(x.remark)c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF2CC'}}});
+  });
+  [6,9,28,9,13,7,16,28,17,10,40].forEach((w,i)=>ws.getColumn(i+1).width=w);
+  const last=3+rows.length;ws.autoFilter={from:'A3',to:'K'+last};
+  const sm=wb.addWorksheet('Summary');sm.getCell('A1').value='Class-wise Summary';sm.getCell('A1').font={name:'Arial',bold:true,size:13};
+  sm.getRow(3).values=['Class','Boys','Girls','Total'];
+  sm.getRow(3).eachCell(c=>{c.font={name:'Arial',bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}};c.border=bd;c.alignment={horizontal:'center'}});
+  const cl=[...new Set(rows.map(x=>x.cls))];let tb=0,tg=0;
+  cl.forEach((c,i)=>{const r=4+i,b=rows.filter(x=>x.cls===c&&x.g==='M').length,g=rows.filter(x=>x.cls===c&&x.g==='F').length;tb+=b;tg+=g;
+    sm.getCell('A'+r).value=c;
+    sm.getCell('B'+r).value={formula:`COUNTIFS(Students!$J$4:$J$${last},$A${r},Students!$D$4:$D$${last},"M")`,result:b};
+    sm.getCell('C'+r).value={formula:`COUNTIFS(Students!$J$4:$J$${last},$A${r},Students!$D$4:$D$${last},"F")`,result:g};
+    sm.getCell('D'+r).value={formula:`B${r}+C${r}`,result:b+g}});
+  const t=4+cl.length;sm.getCell('A'+t).value='Total';
+  [['B',tb],['C',tg],['D',tb+tg]].forEach(([c,v])=>sm.getCell(c+t).value={formula:`SUM(${c}4:${c}${t-1})`,result:v});
+  for(let r=4;r<=t;r++)'ABCD'.split('').forEach(c=>{const x=sm.getCell(c+r);x.font={name:'Arial',bold:r===t};x.border=bd;if(c!=='A')x.alignment={horizontal:'center'}});
+  [14,10,10,10].forEach((w,i)=>sm.getColumn(i+1).width=w);
+  const blob=new Blob([await wb.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(title?title.name.replace(/[^\w]+/g,'_'):'Student_List')+'_Student_List.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000);led('xl','g');
+}
+const led=(id,c,blink)=>{const e=$('L_'+id);e.className='led '+(c||'')+(blink?' blink':'')};
+const ready=typeof pdfjsLib!=='undefined'&&typeof ExcelJS!=='undefined';led('eng',ready?'g':'r');
+if(!ready)$('status').textContent='Libraries failed to load. Check your internet connection and reload.';
+const drop=$('drop');
+drop.onclick=()=>$('file').click();$('file').onchange=e=>handle(e.target.files[0]);
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>handle(e.dataTransfer.files[0]));
+$('q').oninput=render;$('cls').onchange=render;$('dl').onclick=download;
+$('reset').onclick=()=>{['pdf','parse','chk','xl'].forEach(i=>led(i));state=null;$('file').value='';$('result').classList.add('hide');$('upload').classList.remove('hide')};
+</script>
+</body>
+</html>
